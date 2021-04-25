@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System; // χτιστιμο παλετας
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,8 +12,10 @@ using System.IO;
 using Plugin.Toast;
 using SharpCifs.Smb;
 using System.Data.SqlClient;
+using Plugin.SimpleAudioPlayer;
+using System.Data;
 
-namespace test4sql
+namespace test4sql // χτιστιμο παλετας
 {
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class View1 : ContentPage
@@ -21,11 +23,19 @@ namespace test4sql
         public IList<Monkey> Monkeys { get; private set; }
         public string f_cid = "";
         public SqlConnection con;
+        private ISimpleAudioPlayer _simpleAudioPlayer;
 
-        public View1()
+
+        public View1() // χτιστιμο παλετας
         {
             InitializeComponent();
             Monkeys = new List<Monkey>();
+            _simpleAudioPlayer = CrossSimpleAudioPlayer.CreateSimpleAudioPlayer();
+            Stream beepStream = GetType().Assembly.GetManifestResourceStream("test4sql.beep.mp3");
+            bool isSuccess = _simpleAudioPlayer.Load(beepStream);
+            Show_list();
+
+
         }
         //protected override bool OnBackButtonPressed()
         //{
@@ -46,7 +56,7 @@ namespace test4sql
             if (action)
             {
                 //  Navigate to first page
-                MainPage.ExecuteSqlite("delete from PARALABES WHERE ID=" + f_cid);
+                MainPage.ExecuteSqlite("delete from PARALABESXT WHERE ID=" + f_cid);
                 await DisplayAlert("διαγραφτηκε", "", "OK");
                 Show_list();
             }
@@ -56,22 +66,19 @@ namespace test4sql
 
         }
 
-        /*
+        
         async void delete_all(object sender, EventArgs e)
         {
-            var action = await DisplayAlert("Να διαγραφoύν όλα τα τιμολόγια?", "Εισαι σίγουρος?", "Ναι", "Οχι");
+            var action = await DisplayAlert("Να διαγραφoύν όλα τα σκαναρισματα?", "Εισαι σίγουρος?", "Ναι", "Οχι");
             if (action)
             {
                 //  Navigate to first page
-                MainPage.ExecuteSqlite("delete from PARALABES ");
+                MainPage.ExecuteSqlite("delete from PARALABESXT ");
                 await DisplayAlert("διαγραφτηκε", "", "OK");
-                show_list();
+                Show_list();
             }
         }
-        */
-
-
-
+        
         async void SaveFile(string text)
         {
 
@@ -189,7 +196,8 @@ namespace test4sql
 
 
             var contents = connection.CreateCommand();
-            contents.CommandText = "SELECT  * from PARALABES where ATIM ='" + cATIM.Text + "' order by ID DESC ; "; // +BARCODE.Text +"'";
+            //  mono to sygkekrimeno where ATIM ='" + cATIM.Text + "'
+            contents.CommandText = "SELECT  * from PARALABESXT  order by ID DESC ; "; // +BARCODE.Text +"'";
                                                                                                                     // contents.CommandText = "SELECT  * from PARALABES ; "; // +BARCODE.Text +"'";
             var r = contents.ExecuteReader();
             Console.WriteLine("Reading data");
@@ -228,6 +236,9 @@ namespace test4sql
 
 
             //  -----------------SQLSERVER  1.SYNDESH   ---------------------------------------
+
+          
+
             string[] lines = Globals.cSQLSERVER.Split(';');
             string constring = @"Data Source=" + lines[0] + ";Initial Catalog=" + lines[1] + ";Uid=sa;Pwd=" + lines[2]; // ";Initial Catalog=MERCURY;Uid=sa;Pwd=12345678";
 
@@ -235,11 +246,7 @@ namespace test4sql
             con = new SqlConnection(constring);
             try
             {
-                con.Open();
-                // ***************  demo πως τρεχω εντολη στον sqlserver ********************************
-                SqlCommand cmd = new SqlCommand("insert into PALETES(PALET) values (1)");
-                cmd.Connection = con;
-                cmd.ExecuteNonQuery();
+                con.Open();                
             }
             catch (Exception ex)
             {
@@ -247,6 +254,29 @@ namespace test4sql
             }
             //  -----------------SQLSERVER ---------------------------------------
 
+
+            string cc22 = cATIM.Text;
+                if (cc22.Length <18)
+            {
+                await DisplayAlert("Λαθος SSCC", "", "OK");
+                return;
+            }
+
+
+            DataSet ds = new DataSet();
+            SqlCommand cmd2 = new SqlCommand("select top 1 ID FROM PALETES WHERE CONVERT(INT,PALET)=" + cATIM.Text.Substring(12, 7) + "", con);
+            var adapter = new SqlDataAdapter(cmd2);
+            adapter.Fill(ds);
+            if (ds.Tables[0].Rows.Count == 0)
+            {
+                await DisplayAlert("δεν υπαρχει  η παλετα "+ cATIM.Text.Substring(12, 7), "", "OK");
+                return;
+            }
+            int mID = (int)ds.Tables[0].Rows[0][0]; // 201712552030 0217
+
+            SqlCommand cmd = new SqlCommand("delete from PALETES WHERE CONVERT(INT,PALET)=" + cATIM.Text.Substring(12, 7) +  "");
+            cmd.Connection = con;
+            cmd.ExecuteNonQuery();
 
 
 
@@ -278,7 +308,7 @@ namespace test4sql
                        //     DisplayAlert("Θα διαγραφει το ηδη το αρχειο", "....", "OK");
                        //     file.Delete();  // https://csharpdoc.hotexamples.com/class/SharpCifs.Smb/SmbFile#
                        // }
-           
+
 
                //Get writable stream.
                var writeStream = file.GetOutputStream();
@@ -299,7 +329,10 @@ namespace test4sql
             // '=====================  EGGTIM2.TXT  ======================================================'
             */
 
-
+            // ***************  demo πως τρεχω εντολη στον sqlserver ********************************
+            //  SqlCommand cmd = new SqlCommand("insert into PALETES(PALET,KOD,PARTIDA,POSO) values (1)");
+            //  cmd.Connection = con;
+            //  cmd.ExecuteNonQuery();
 
 
 
@@ -313,11 +346,11 @@ namespace test4sql
             connection.Open();
             // query the database to prove data was inserted!
             var contents = connection.CreateCommand();
-            contents.CommandText = "SELECT ATIM,BARCODE FROM PARALABES";
+            contents.CommandText = "SELECT ATIM,BARCODE FROM PARALABESXT";
             var r = contents.ExecuteReader();
             // Console.WriteLine("Reading data");
-
             String cPal, cPart, cPos, cKod;
+
             string cc = "";
 
 
@@ -343,17 +376,19 @@ namespace test4sql
                     cKod = "00" + cKod.Substring(11, 4);
 
                     cPos = r["BARCODE"].ToString();
-                    cPos = cPos.Substring(20, 5);
+                    cPos = cPos.Substring(19, 5);
 
                     cPart = r["BARCODE"].ToString();
-                    cPart = cPart.Substring(28, 7);
+                    cPart = cPart.Substring(27, 7);
 
 
+                   
 
-                    SqlCommand cmd = new SqlCommand("insert into PALETES(PALET,[KOD],[PARTIDA],[POSO]) values ('" + cPal + "','" + cKod + "','" + cPart + "'," + cPos + ")");
+
+                    cmd = new SqlCommand("insert into PALETES(PALET,[KOD],[PARTIDA],[POSO]) values ('" + cPal + "','" + cKod + "','" + cPart + "'," + cPos + ")");
                     cmd.Connection = con;
                     cmd.ExecuteNonQuery();
-
+                    //}
 
 
 
@@ -365,7 +400,7 @@ namespace test4sql
                 CrossToastPopUp.Current.ShowToastMessage("Αποθηκεύτηκε");
                 //  SaveFile(cc);
 
-                MainPage.ExecuteSqlite("DELETE FROM  PARALABES");
+                MainPage.ExecuteSqlite("DELETE FROM  PARALABESXT");
 
 
             }
@@ -376,16 +411,12 @@ namespace test4sql
 
         }
 
-
-
-
-
-    
-
-
         async void PaletaChanged(object sender, EventArgs e)
         {
-
+            if (Globals.useBarcodes == "12")  // ενσωματωμενο σκανερ
+            {
+                return;
+            }
             if (Paleta.Text.Length < 34) return;
 
             BindingContext = null;
@@ -403,18 +434,25 @@ namespace test4sql
             
 
             Paleta.Text = ""; // to ekana etsi gia na mporei na pairnei 2 fores tin idia paleta
-            MainPage.ExecuteSqlite("INSERT INTO PARALABES (ATIM,BARCODE) VALUES ('" + cATIM.Text + "','" + Paleta.Text + "')");
+            MainPage.ExecuteSqlite("INSERT INTO PARALABESXT (ATIM,BARCODE) VALUES ('" + cATIM.Text + "','" + Paleta.Text + "')");
             Show_list();
             Paleta.Focus();
 
         }
-      
-        
-        
+
+
+
         async void barcfoc(object sender, EventArgs e)
         {
 
             string cc = "";
+            if (Globals.useBarcodes == "12")  // ενσωματωμενο σκανερ
+            {
+                
+
+                return;
+            }
+            
             var scanPage = new ZXingScannerPage();
             // Navigate to our scanner page
             await Navigation.PushAsync(scanPage);
@@ -442,12 +480,19 @@ namespace test4sql
 
                 });
             };
+       
+         
         }
 
 
         async void paletfoc()
         {
-           
+            if (Globals.useBarcodes == "12")  // ενσωματωμενο σκανερ
+            {
+                
+
+                return;
+            }
             var scanPage = new ZXingScannerPage();
             // Navigate to our scanner page
             await Navigation.PushAsync(scanPage);
@@ -481,5 +526,38 @@ namespace test4sql
 
         }
 
+        private void PALCOMPLETED(object sender, EventArgs e)
+        {
+            BindingContext = null;
+            Monkeys.Add(new Monkey
+            {
+                Name = Paleta.Text,
+
+                Location = "***",
+                ImageUrl = "---",
+                idPEL = "///"
+            });
+
+            BindingContext = this;
+
+
+
+            // Paleta.Text = ""; // to ekana etsi gia na mporei na pairnei 2 fores tin idia paleta
+            MainPage.ExecuteSqlite("INSERT INTO PARALABESXT (ATIM,BARCODE) VALUES ('" + cATIM.Text + "','" + Paleta.Text + "')");
+            Show_list();
+            Paleta.Text = "";
+            Paleta.Focus();
+        }
+
+        private void arxcompleted(object sender, EventArgs e)
+        {
+            Paleta.Focus();
+        }
+
+        private void NewSSCC(object sender, EventArgs e)
+        {
+            cATIM.Text = "";
+            Paleta.Text = "";
+        }
     }
 }

@@ -130,6 +130,12 @@ namespace test4sql
 
             l = MainPage.ExecuteSqlite(c);
 
+            c = "CREATE TABLE IF NOT EXISTS PARALABESXT( ID  INTEGER PRIMARY KEY,ATIM [nvarchar](35),BARCODE [nvarchar](45) )";
+
+
+            l = MainPage.ExecuteSqlite(c);
+
+
 
 
             c = "CREATE TABLE IF NOT EXISTS BARCODES( ID  INTEGER PRIMARY KEY,KOD [nvarchar](25),BARCODE [nvarchar](15) )";

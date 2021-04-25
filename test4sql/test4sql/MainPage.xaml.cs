@@ -578,11 +578,30 @@ namespace test4sql
 
         private async void printing(object sender, EventArgs e)
         {
+            string ipAddress = "192.168.1.80";
+            int portNumber = 9100;
+            List<string> myText = new List<string>()
+            {toGreek( "ΓΕΙΑ ΣΟΥ ΜΕΓΑΛΕ ΜΟΥ"),"From","Replace","MrNashad","Please Like"};
 
+            var printer = DependencyService.Get<test4sql.iPrinter>();
+            if (printer==null)
+            {
+                await DisplayAlert("Error", "δεν υπαρχει συνδεση","");
+                return;
+
+            }
+            try
+            {
+                printer.Print(ipAddress, portNumber, myText);
+            }
+            catch
+            {
+                await DisplayAlert("error2", "", "");
+            }
 
             // Ethernet or WiFi
-        //    var printer = new NetworkPrinter(ipAddress: "192.168.1.80", port: 9000, reconnectOnTimeout: true);
-
+           // var printer = new ESCPOS_NET.NetworkPrinter(ipAddress: "192.168.1.80", port: 9000, reconnectOnTimeout: true);
+           // printer.Write()
             /*
             var e = new EPSON();
             printer.Write(
@@ -635,8 +654,60 @@ NewMethod(e),
 
         }
 
+        static int instr(int StartPos, String SearchString, String SearchFor, int IgnoreCaseFlag)
+        {
+            int result = -1;
+            if (IgnoreCaseFlag == 1)
+                result = SearchString.IndexOf(SearchFor, StartPos, StringComparison.OrdinalIgnoreCase);
+            else
+                result = SearchString.IndexOf(SearchFor, StartPos);
+            return result;
+        }
 
 
+
+        public static string toGreek(string Q)
+        {
+            string t = "";
+            for (int k = 1; k <= Q.Length; k += 1)
+            {
+                string m = Q.Substring(k - 1, 1);
+                if (instr(0, "ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ", m, 1) == -1)
+                {
+                    t = t + m;
+                }
+                else
+                {
+                    if (m == "Α") { t += "\u0380"; }
+                    if (m == "Β") { t += "\u0381"; }
+                    if (m == "Γ") { t += "\u0382"; }
+                    if (m == "Δ") { t += "\u0383"; }
+                    if (m == "Ε") { t += "\u0384"; }
+                    if (m == "Ζ") { t += "\u0385"; }
+                    if (m == "Η") { t += "\u0386"; }
+                    if (m == "Θ") { t += "\u0387"; }
+
+                    if (m == "Ι") { t += "\u0388"; }
+                    if (m == "Κ") { t += "\u0389"; }
+                    if (m == "Λ") { t += "\u038a"; }
+                    if (m == "Μ") { t += "\u038b"; }
+                    if (m == "Ν") { t += "\u038c"; }
+                    if (m == "Ξ") { t += "\u038d"; }
+                    if (m == "Ο") { t += "\u038E"; }
+                    if (m == "Π") { t += "\u038F"; }
+
+                    if (m == "Ρ") { t += "\u0390"; }
+                    if (m == "Σ") { t += "\u0391"; }
+                    if (m == "Τ") { t += "\u0392"; }
+                    if (m == "Υ") { t += "\u0393"; }
+                    if (m == "Φ") { t += "\u0394"; }
+                    if (m == "Χ") { t += "\u0395"; }
+                    if (m == "Ψ") { t += "\u0396"; }
+                    if (m == "Ω") { t += "\u0397"; }
+                }
+            }
+            return t;
+        }
 
 
 

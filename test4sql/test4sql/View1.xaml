@@ -5,12 +5,13 @@
     <ContentPage.Content>
 
 
+        
 
         <StackLayout>
             <StackLayout Orientation="Horizontal" >
 
                 <Label Text="Aρ.Παλέτας "/>
-                <Entry x:Name="cATIM" Placeholder=".................." />
+                <Entry x:Name="cATIM" Completed="arxcompleted" Placeholder=".................." />
 
                 <Button Text="Σκανάρω παλέτα" Clicked="ViewPalet"/>
                 
@@ -25,10 +26,15 @@
             </StackLayout>
             <StackLayout Orientation="Horizontal" >
                 <Label Text="Παλέτα "/>
-                <Label Text=".... "/>
+                <Label Text="ΠΕΡΙΕΧΕΙ.... "/>
                 <Entry x:Name="Paleta" Placeholder=".........................."  
-                       Focused="barcfoc"
-                       TextChanged="PaletaChanged"/>
+                      Completed="PALCOMPLETED"
+                       TextChanged="PaletaChanged"
+                       
+                       Focused="barcfoc"/>
+                       <!-- TextChanged="PaletaChanged" -->
+                       
+                       
             </StackLayout>
 
             
@@ -36,15 +42,21 @@
 
             <StackLayout Orientation="Horizontal" >
 
-               
-               
-               
-            </StackLayout>
-              <Button Text="Aποστ.Αρχ" Clicked="WriteFile"/>
+               <Button Text="Aποστ.Αρχ" Clicked="WriteFile"/>
+            
+            
                <Button Text="Eξοδος" Clicked="CloseInvoice"/>
 
             <Button Text="Διαγραφή" Clicked="Diag_barcode" />
+               
+               
+            </StackLayout>
 
+
+            <StackLayout Orientation="Horizontal" >
+                <Button Text="Διαγραφή Ολων των σκαναρισματων" Clicked="delete_all" />
+                <Button Text="Νέo SSCC" Clicked="NewSSCC" />
+            </StackLayout>
             <ListView ItemsSource="{Binding Monkeys}"
                        x:Name="listview"
                   HasUnevenRows="true"
@@ -58,10 +70,10 @@
 
                                 <Label Grid.Column="1" 
                                    Text="{Binding Name}"
-                                   FontAttributes="Bold" FontSize="Large" />
+                                   FontAttributes="Bold" FontSize="Micro"  />
                                 <Label 
                                     
-                                   Text="{Binding Location}"
+                                   Text="{Binding Location}"  FontSize="Small"  
                                     />
 
                                 <Label                                    

@@ -14,8 +14,9 @@
                 HorizontalOptions="CenterAndExpand" />
 
             <Entry x:Name="BARCODES"
-                   Placeholder="SCAN BARCODE ΑΠΟ ΠINAKA BARCODES" 
-                    BackgroundColor="Azure"    
+                   Placeholder="0=κωδ 1=SCAN ΑΠΟ BARCODES/11=ΦΩΤΟ 12=ΕΝΣ.ΣΚΑΝΕΡ" 
+                    BackgroundColor="Azure"   
+                   FontSize="12"
                    />
 
 

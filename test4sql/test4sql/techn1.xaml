@@ -28,7 +28,7 @@
                 <Label Text="Παλέτα "/>
             <Label Text=".... "/>
                 <Entry x:Name="Paleta" Placeholder=".........................."  
-                       Focused="barcfoc"
+                       Focused="barcfoc" Completed="PaletComplete"
                        TextChanged="PaletaChanged"/>
             </StackLayout>
 
@@ -36,8 +36,8 @@
 
             <StackLayout Orientation="Horizontal" >
 
-                    <Button Text="Κλείσιμο Τιμολογίου" Clicked="CloseInvoice"/>
-                    <Button Text="Διαγραφή" Clicked="diag_barcode" />
+                    <Button Text="Εξοδος χωρις Αποστολή" Clicked="CloseInvoice"/>
+                    <Button Text="Διαγραφή σειράς" Clicked="diag_barcode" />
                 </StackLayout>
 
 

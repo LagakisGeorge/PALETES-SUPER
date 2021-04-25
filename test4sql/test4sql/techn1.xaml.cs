@@ -17,7 +17,7 @@ using System.Data.SqlClient;
 namespace test4sql
 {
     [XamlCompilation(XamlCompilationOptions.Compile)]
-    public partial class techn1 : ContentPage
+    public partial class techn1 : ContentPage  // timologisi  - φορτωση τιμολογιου
 
 
     {
@@ -30,6 +30,11 @@ namespace test4sql
         {
             InitializeComponent();
             Monkeys = new List<Monkey>();
+
+
+
+
+
         }
         protected override bool OnBackButtonPressed()
         {
@@ -186,9 +191,19 @@ namespace test4sql
             {
                 con.Open();
                 // ***************  demo πως τρεχω εντολη στον sqlserver ********************************
-                SqlCommand cmd = new SqlCommand("insert into PALETES(PALET) values (1)");
+                SqlCommand cmd = new SqlCommand("DELETE FROM PALETTIM ");
                 cmd.Connection = con;
                 cmd.ExecuteNonQuery();
+             //   cmd = new SqlCommand("insert into PALETESTEMP (ATIM,SSCC,HME) values ('','',GETDATE() )");
+              //  cmd.Connection = con;
+              //  cmd.ExecuteNonQuery();
+
+
+
+
+
+
+
             }
             catch (Exception ex)
             {
@@ -231,7 +246,7 @@ namespace test4sql
 
 
 
-                SqlCommand cmd = new SqlCommand("insert into PALETTIM(SCAN,ATIM) values ('" + r["BARCODE"].ToString() + "','" + r["ATIM"].ToString() + "')");
+                SqlCommand cmd = new SqlCommand("insert into PALETTIM(SCAN,ATIM,HME) values ('" + r["BARCODE"].ToString() + "','" + r["ATIM"].ToString() + "',GETDATE()  )");
                 cmd.Connection = con;
                 cmd.ExecuteNonQuery();
 
@@ -258,7 +273,14 @@ namespace test4sql
 
         async void PaletaChanged(object sender, EventArgs e)
         {
+            if (Globals.useBarcodes == "12")  // ενσωματωμενο σκανερ
+            {
+               
+                    return;
+                
 
+               
+            }
             if (Paleta.Text.Length == 0) return;
 
             BindingContext = null;
@@ -273,16 +295,25 @@ namespace test4sql
 
             BindingContext = this;
 
-            Paleta.Text = ""; // to ekana etsi gia na mporei na pairnei 2 fores tin idia paleta
+             Paleta.Text = ""; // to ekana etsi gia na mporei na pairnei 2 fores tin idia paleta
             MainPage.ExecuteSqlite("INSERT INTO PARALABES (ATIM,BARCODE) VALUES ('" + cATIM.Text + "','" + Paleta.Text + "')");
+           // Paleta.Text = ""; // to ekana etsi gia na mporei na pairnei 2 fores tin idia paleta
             show_list();
+
             Paleta.Focus();
+        
 
         }
         async void barcfoc(object sender, EventArgs e)
         {
-
             string cc = "";
+            if (Globals.useBarcodes == "12")  // ενσωματωμενο σκανερ
+            {
+                cc = Paleta.Text;
+
+                return;
+            }
+           
             var scanPage = new ZXingScannerPage();
             // Navigate to our scanner page
             await Navigation.PushAsync(scanPage);
@@ -336,5 +367,33 @@ namespace test4sql
         }
 
 
+        private void PaletComplete(object sender, EventArgs e)
+        {
+
+            // διαβαζει απο ενσωματομενο σκανερ
+            if (Globals.useBarcodes != "12")  // ενσωματωμενο σκανερ
+            {
+                return;
+            }
+            BindingContext = null;
+            Monkeys.Add(new Monkey
+            {
+                Name = Paleta.Text,
+
+                Location = "***",
+                ImageUrl = "---",
+                idPEL = "///"
+            });
+
+            BindingContext = this;
+
+           // Paleta.Text = ""; // to ekana etsi gia na mporei na pairnei 2 fores tin idia paleta
+            MainPage.ExecuteSqlite("INSERT INTO PARALABES (ATIM,BARCODE) VALUES ('" + cATIM.Text + "','" + Paleta.Text + "')");
+            Paleta.Text = ""; // to ekana etsi gia na mporei na pairnei 2 fores tin idia paleta
+            show_list();
+
+            Paleta.Focus();
+
+        }
     }
 }
