@@ -24,6 +24,7 @@
 
   <ItemGroup>
     <PackageReference Include="Base2Base.Printers" Version="1.1.0" />
+    <PackageReference Include="DLToolkit.Forms.Controls.FlowListView" Version="2.0.11" />
     <PackageReference Include="ESCPOS_NET" Version="1.4.0" />
     <PackageReference Include="LinkOS_Xamarin_SDK" Version="1.2.0" />
     <PackageReference Include="Mono.Data.Sqlite.Portable" Version="1.0.3.5" />
@@ -48,6 +49,9 @@
 
   <ItemGroup>
     <EmbeddedResource Update="griditems.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="ListViewPage1.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
     <EmbeddedResource Update="Page1.xaml">

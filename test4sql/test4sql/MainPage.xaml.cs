@@ -1052,6 +1052,10 @@ NewMethod(e),
             return rowcount;
         }
 
+        private void SLISTVIEW(object sender, EventArgs e)
+        {
+             Navigation.PushAsync(new ListViewPage1() );  //imports  ListViewPage1
+        }
     }  // public partial class MainPage : ContentPage
 
 }  // namespace

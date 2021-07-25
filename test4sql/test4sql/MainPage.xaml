@@ -97,7 +97,11 @@
                 Clicked="printing"
                  />
 
-           
+            <Button x:Name="LISTVIEW" 
+                Text="LISTVIEW"
+                Clicked="SLISTVIEW"
+                 />
+
         </StackLayout>
         
 
